@@ -24,25 +24,39 @@ from oauth2client.service_account import ServiceAccountCredentials
 #         return pd.DataFrame()
     
 @st.cache_data
-def load_google_sheet_with_auth(sheet_name):
+# def load_google_sheet_with_auth(sheet_name):
+#     try:
+#         creds_dict = st.secrets["gcp_service_account"]
+#         creds_json = json.loads(str(creds_dict).replace("'", '"')) 
+
+#         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+#         credentials = ServiceAccountCredentials.from_json_keyfile_dict(creds_json, scope)
+#         st.write("✅ Loaded credentials successfully")
+
+#         client = gspread.authorize(credentials)
+#         sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1LKPipvPUmM8bImUz6mGfMhFGKWljSroH42WNYCiMQss/edit?gid=0#gid=0").sheet1
+#         data = sheet.get_all_records()
+#         return pd.DataFrame(data)
+
+#     except Exception as e:
+#         st.error(f"❌ Failed to load Google Sheet: {e}")
+#         return pd.DataFrame()
+
+def load_google_sheet_with_auth(sheet_name=None):
     try:
-        # # Prepare credentials from Streamlit secrets
-        # scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        # credentials_dict = st.secrets["gcp_service_account"]
-        # creds = ServiceAccountCredentials.from_json_keyfile_dict(credentials_dict, scope)
-
-        # # Connect to Google Sheets
-        # client = gspread.authorize(creds)
-        # sheet = client.open(sheet_name).sheet1  # Or specify by title
-        # Load service account credentials from st.secrets
         creds_dict = st.secrets["gcp_service_account"]
-        creds_json = json.loads(str(creds_dict).replace("'", '"'))  # Optional: convert TOML to JSON
+        
+        scope = [
+            "https://spreadsheets.google.com/feeds",
+            "https://www.googleapis.com/auth/drive"
+        ]
+        credentials = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 
-        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        credentials = ServiceAccountCredentials.from_json_keyfile_dict(creds_json, scope)
+        st.write("✅ Loaded credentials successfully")
 
         client = gspread.authorize(credentials)
-        sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1LKPipvPUmM8bImUz6mGfMhFGKWljSroH42WNYCiMQss/edit?gid=0#gid=0").sheet1
+        sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1LKPipvPUmM8bImUz6mGfMhFGKWljSroH42WNYCiMQss").sheet1
+
         data = sheet.get_all_records()
         return pd.DataFrame(data)
 
@@ -50,8 +64,6 @@ def load_google_sheet_with_auth(sheet_name):
         st.error(f"❌ Failed to load Google Sheet: {e}")
         return pd.DataFrame()
 
-# Usage
-# mapping_df = load_google_sheet_with_auth("enrolled")
 
 # ==========================
 # Streamlit App UI
