@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import requests
+import json
 from io import StringIO
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -25,14 +26,23 @@ from oauth2client.service_account import ServiceAccountCredentials
 @st.cache_data
 def load_google_sheet_with_auth(sheet_name):
     try:
-        # Prepare credentials from Streamlit secrets
-        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        credentials_dict = st.secrets["gcp_service_account"]
-        creds = ServiceAccountCredentials.from_json_keyfile_dict(credentials_dict, scope)
+        # # Prepare credentials from Streamlit secrets
+        # scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+        # credentials_dict = st.secrets["gcp_service_account"]
+        # creds = ServiceAccountCredentials.from_json_keyfile_dict(credentials_dict, scope)
 
-        # Connect to Google Sheets
-        client = gspread.authorize(creds)
-        sheet = client.open(sheet_name).sheet1  # Or specify by title
+        # # Connect to Google Sheets
+        # client = gspread.authorize(creds)
+        # sheet = client.open(sheet_name).sheet1  # Or specify by title
+        # Load service account credentials from st.secrets
+        creds_dict = st.secrets["gcp_service_account"]
+        creds_json = json.loads(str(creds_dict).replace("'", '"'))  # Optional: convert TOML to JSON
+
+        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+        credentials = ServiceAccountCredentials.from_json_keyfile_dict(creds_json, scope)
+
+        client = gspread.authorize(credentials)
+        sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1LKPipvPUmM8bImUz6mGfMhFGKWljSroH42WNYCiMQss/edit?gid=0#gid=0").sheet1
         data = sheet.get_all_records()
         return pd.DataFrame(data)
 
