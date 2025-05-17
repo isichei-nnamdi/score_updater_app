@@ -175,8 +175,8 @@ st.markdown(
             left: 0;
             right: 0;
             background-color: #f0f2f6;
-            padding: 10px 0;
-            font-size: 13px;
+            padding: 6px 0;
+            font-size: 12px;
             text-align: center;
             color: #444;
             border-top: 1px solid #ddd;
@@ -184,20 +184,20 @@ st.markdown(
         }
         .main-footer a {
             text-decoration: none;
-            margin: 0 8px;
+            margin: 0 6px;
             color: #0366d6;
         }
         .main-footer a:hover {
             text-decoration: underline;
         }
         .footer-icons {
-            margin-top: 5px;
+            margin-top: 4px;
         }
         .footer-icons a {
             text-decoration: none;
             color: #444;
-            margin: 0 10px;
-            font-size: 16px;
+            margin: 0 8px;
+            font-size: 13px;
         }
         </style>
         <div class="main-footer">
