@@ -10,105 +10,59 @@ from oauth2client.service_account import ServiceAccountCredentials
 # Load Google Sheet Public CSV
 # ==========================
 
-# @st.cache_data
-# def load_google_sheet_public_csv(sheet_url):
-#     try:
-#         file_id = sheet_url.split("/d/")[1].split("/")[0]
-#         csv_url = f"https://docs.google.com/spreadsheets/d/{file_id}/export?format=csv"
-#         response = requests.get(csv_url)
-#         response.raise_for_status()
-#         data = pd.read_csv(StringIO(response.content.decode("utf-8")))
-#         return data
-#     except Exception as e:
-#         st.error(f"❌ Failed to load Google Sheet: {e}")
-#         return pd.DataFrame()
+@st.cache_data
+def load_google_sheet_with_auth(sheet_name: str) -> pd.DataFrame:
+    try:
+        """Load data from a Google Sheet using service account credentials."""
+        # Load credentials from Streamlit secrets
+        creds_dict = st.secrets["gcp_service_account"]
+
+        # Define API scope and authorize client
+        scope = [
+            "https://spreadsheets.google.com/feeds",
+            "https://www.googleapis.com/auth/drive"
+        ]
+        credentials = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+        client = gspread.authorize(credentials)
+
+        # Open the spreadsheet and first worksheet
+        sheet_url = "https://docs.google.com/spreadsheets/d/1LKPipvPUmM8bImUz6mGfMhFGKWljSroH42WNYCiMQss"
+        worksheet = client.open_by_url(sheet_url).sheet1
+
+        # Fetch all records and return as DataFrame
+        data = worksheet.get_all_records()
+        return pd.DataFrame(data)
     
+    except Exception as e:
+        st.error(f"❌ Failed to load Google Sheet: {e}")
+        return pd.DataFrame()
+
 # @st.cache_data
 # def load_google_sheet_with_auth(sheet_name):
-#     try:
-#         creds_dict = st.secrets["gcp_service_account"]
-#         creds_json = json.loads(str(creds_dict).replace("'", '"')) 
-
-#         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-#         credentials = ServiceAccountCredentials.from_json_keyfile_dict(creds_json, scope)
-#         st.write("✅ Loaded credentials successfully")
-
-#         client = gspread.authorize(credentials)
-#         sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1LKPipvPUmM8bImUz6mGfMhFGKWljSroH42WNYCiMQss/edit?gid=0#gid=0").sheet1
-#         data = sheet.get_all_records()
-#         return pd.DataFrame(data)
-
-#     except Exception as e:
-#         st.error(f"❌ Failed to load Google Sheet: {e}")
-#         return pd.DataFrame()
-
-# def load_google_sheet_with_auth(sheet_name=None):
 #     # try:
-#     #     creds_dict = st.secrets["gcp_service_account"]
-        
-#     #     scope = [
-#     #         "https://spreadsheets.google.com/feeds",
-#     #         "https://www.googleapis.com/auth/drive"
-#     #     ]
-#     #     credentials = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+#     creds_dict = st.secrets["gcp_service_account"]
+#     st.success("✅ Credentials loaded.")
 
-#     #     st.write("✅ Loaded credentials successfully")
+#     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+#     credentials = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 
-#     #     client = gspread.authorize(credentials)
-#     #     sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1LKPipvPUmM8bImUz6mGfMhFGKWljSroH42WNYCiMQss").sheet1
+#     client = gspread.authorize(credentials)
+#     st.success("✅ Authorized gspread client.")
 
-#     #     data = sheet.get_all_records()
-#     #     return pd.DataFrame(data)
+#     sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1LKPipvPUmM8bImUz6mGfMhFGKWljSroH42WNYCiMQss")
+#     st.success("✅ Opened Google Sheet.")
+
+#     worksheet = sheet.sheet1
+#     st.success("✅ Accessed first worksheet.")
+
+#     data = worksheet.get_all_records()
+#     st.success("✅ Data fetched from Google Sheet.")
+
+#     return pd.DataFrame(data)
 
 #     # except Exception as e:
 #     #     st.error(f"❌ Failed to load Google Sheet: {e}")
-#     #     return pd.DataFrame()
-#     try:
-#         creds_dict = st.secrets["gcp_service_account"]
-#         st.success("✅ Credentials loaded.")
-
-#         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-#         credentials = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
-
-#         client = gspread.authorize(credentials)
-#         st.success("✅ Authorized gspread client.")
-
-#         sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1LKPipvPUmM8bImUz6mGfMhFGKWljSroH42WNYCiMQss").sheet1
-#         st.success("✅ Opened sheet.")
-
-#         data = sheet.get_all_records()
-#         return pd.DataFrame(data)
-
-#     except Exception as e:
-#         st.error(f"❌ Failed to load Google Sheet: {e}")
-#         return pd.DataFrame()
-
-@st.cache_data
-def load_google_sheet_with_auth(sheet_name):
-    # try:
-    creds_dict = st.secrets["gcp_service_account"]
-    st.success("✅ Credentials loaded.")
-
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    credentials = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
-
-    client = gspread.authorize(credentials)
-    st.success("✅ Authorized gspread client.")
-
-    sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1LKPipvPUmM8bImUz6mGfMhFGKWljSroH42WNYCiMQss")
-    st.success("✅ Opened Google Sheet.")
-
-    worksheet = sheet.sheet1
-    st.success("✅ Accessed first worksheet.")
-
-    data = worksheet.get_all_records()
-    st.success("✅ Data fetched from Google Sheet.")
-
-    return pd.DataFrame(data)
-
-    # except Exception as e:
-    #     st.error(f"❌ Failed to load Google Sheet: {e}")
-        # return pd.DataFrame()
+#         # return pd.DataFrame()
 
 
 
