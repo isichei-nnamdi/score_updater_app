@@ -59,13 +59,22 @@ def get_greeting():
 
 col1, col2, col3 = st.columns([2, 5, 2])
 with col2:
-    col1, col2 = st.columns([1, 8])
+    st.markdown(
+        """
+        <div style="display: flex; align-items: center;">
+            <img src="favicon_io/android-chrome-512x512.png" width="40" style="margin-right: 10px;">
+            <h1 style="margin: 0;">Exam Score Updater</h1>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    # col1, col2 = st.columns([1, 8])
 
-    with col1:
-        st.image("favicon_io/android-chrome-512x512.png", width=40) 
+    # with col1:
+    #     st.image("favicon_io/android-chrome-512x512.png", width=40) 
     
-    with col2:
-        st.markdown("<h1 style='margin: 0; padding-top: 10px;'>Exam Score Updater</h1>", unsafe_allow_html=True)
+    # with col2:
+    #     st.markdown("<h1 style='margin: 0; padding-top: 10px;'>Exam Score Updater</h1>", unsafe_allow_html=True)
     # st.title("favicon_io/android-chrome-512x512.png Exam Score Updater")
 
     # Display the greeting message
