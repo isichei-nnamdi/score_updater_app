@@ -43,19 +43,38 @@ from oauth2client.service_account import ServiceAccountCredentials
 #         return pd.DataFrame()
 
 def load_google_sheet_with_auth(sheet_name=None):
+    # try:
+    #     creds_dict = st.secrets["gcp_service_account"]
+        
+    #     scope = [
+    #         "https://spreadsheets.google.com/feeds",
+    #         "https://www.googleapis.com/auth/drive"
+    #     ]
+    #     credentials = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+
+    #     st.write("✅ Loaded credentials successfully")
+
+    #     client = gspread.authorize(credentials)
+    #     sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1LKPipvPUmM8bImUz6mGfMhFGKWljSroH42WNYCiMQss").sheet1
+
+    #     data = sheet.get_all_records()
+    #     return pd.DataFrame(data)
+
+    # except Exception as e:
+    #     st.error(f"❌ Failed to load Google Sheet: {e}")
+    #     return pd.DataFrame()
     try:
         creds_dict = st.secrets["gcp_service_account"]
-        
-        scope = [
-            "https://spreadsheets.google.com/feeds",
-            "https://www.googleapis.com/auth/drive"
-        ]
+        st.success("✅ Credentials loaded.")
+
+        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
         credentials = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 
-        st.write("✅ Loaded credentials successfully")
-
         client = gspread.authorize(credentials)
+        st.success("✅ Authorized gspread client.")
+
         sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1LKPipvPUmM8bImUz6mGfMhFGKWljSroH42WNYCiMQss").sheet1
+        st.success("✅ Opened sheet.")
 
         data = sheet.get_all_records()
         return pd.DataFrame(data)
