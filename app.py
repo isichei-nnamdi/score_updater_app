@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
-import requests
-import json
-from io import StringIO
+from datetime import datetime
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
@@ -37,15 +35,6 @@ def load_google_sheet_with_auth(sheet_name: str) -> pd.DataFrame:
         st.error(f"❌ Failed to load Google Sheet: {e}")
         return pd.DataFrame()
 
-
-
-# ==========================
-# Streamlit App UI
-# ==========================
-
-st.title("🔁 Student Score Updater")
-from datetime import datetime
-
 def get_greeting():
     hour = datetime.now().hour
     if 5 <= hour < 12:
@@ -57,114 +46,125 @@ def get_greeting():
     else:
         return "Hello"
 
-# Display the greeting message
-st.markdown(f"""
-### 👋 {get_greeting()} and welcome to my Score Updater App designed by Nnamdi. 🤗
 
-This app allows you to quickly update student scores directly into a connected Google Sheet.
+# ==========================
+# Streamlit App UI
+# ==========================
 
-**How to use the app:**
-1. Upload or edit the scores using the provided form.
-2. Match each student using their unique ID or email address.
-3. Click **"Submit"** to instantly update the data in the Google Sheet.
-4. Confirm your submission with the success message that appears.
+col1, col2, col3 = st.columns[1, 5, 1]
+with col2:
+    st.title("🔁 Student Score Updater")
 
-Feel free to refresh or re-run the app if needed. Happy scoring! 🎯
-""")
+    # Display the greeting message
+    st.markdown(f"""
+    #### 👋 {get_greeting()} and welcome to my Score Updater App designed by Nnamdi for Miva Open University. 🤗
 
+    This app is designed to help you seamlessly update student scores by merging the Grade Book downloaded from the Miva LMS with the Live Score Sheet.
 
-# Upload files
-file_a = st.file_uploader("📤 Upload File A (Grade Book from LMS)", type=["csv"])
-file_b = st.file_uploader("📤 Upload File B (Live Scores Sheet)", type=["csv"])
+    **How to use the app:**
+    1. 📥 Upload the Grade Book file you downloaded from the Miva LMS for the specific course.
+    2. 📊 Upload the Live Score Sheet that contains the latest exam scores for the students.
+    3. 🛠️ Select the column in the Grade Book that you want to update (e.g., Exam, CA, etc.).
+    4. 👀 Preview the updated Grade Book with the new scores.
+    5. ✅ Click the Update Scores button to apply the changes.
+    6. ⬇️ Download the updated sheet and upload it back to the Miva LMS.
 
-if file_a and file_b:
-    # Load files
-    df_a = pd.read_csv(file_a)
-    df_b = pd.read_csv(file_b, header=1)  # Read second row as header
-
-    # Load mapping sheet
-    mapping_df = load_google_sheet_with_auth("enrolled")
-    st.success("✅ Google Sheet loaded successfully.")
+    Feel free to refresh or re-run the app if needed. Happy scoring! 🎯
+    """)
 
 
-    if not mapping_df.empty:
-        try:
-            # Normalize column names
-            df_a.columns = df_a.columns.str.strip()
-            df_b.columns = df_b.columns.str.strip()
-            mapping_df.columns = mapping_df.columns.str.strip()
+    # Upload files
+    file_a = st.file_uploader("📤 Upload File A (Grade Book from LMS)", type=["csv"])
+    file_b = st.file_uploader("📤 Upload File B (Live Scores Sheet)", type=["csv"])
 
-            # Rename for consistency
-            email_col = "SIS Login ID"  # Actual column name in File A
-            df_a[email_col] = df_a[email_col].astype(str).str.strip().str.lower()
-            mapping_df["email"] = mapping_df["email"].astype(str).str.strip().str.lower()
+    if file_a and file_b:
+        # Load files
+        df_a = pd.read_csv(file_a)
+        df_b = pd.read_csv(file_b, header=1)  # Read second row as header
 
-            # Map Student ID to df_a
-            email_to_id = dict(zip(mapping_df["email"], mapping_df["Student ID Number"]))
-            df_a["Student ID Number"] = df_a[email_col].map(email_to_id)
+        # Load mapping sheet
+        mapping_df = load_google_sheet_with_auth("enrolled")
+        st.success("✅ Google Sheet loaded successfully.")
 
-            # Normalize Student IDs
-            df_a["Student ID Number"] = df_a["Student ID Number"].astype(str).str.strip().str.replace(".0", "", regex=False)
-            df_b["Student ID Number"] = df_b["Student ID Number"].astype(str).str.strip()
 
-            # ✅ FIX: Clean and convert Total column to numeric
-            df_b["Total"] = df_b["Total"].astype(str).str.replace(",", "").str.strip()
-            df_b["Total"] = pd.to_numeric(df_b["Total"], errors="coerce").fillna(0)
+        if not mapping_df.empty:
+            try:
+                # Normalize column names
+                df_a.columns = df_a.columns.str.strip()
+                df_b.columns = df_b.columns.str.strip()
+                mapping_df.columns = mapping_df.columns.str.strip()
 
-            # ✅ Optional: Round scores to 2 decimal places
-            df_b["Total"] = df_b["Total"].round(2)
+                # Rename for consistency
+                email_col = "SIS Login ID"  # Actual column name in File A
+                df_a[email_col] = df_a[email_col].astype(str).str.strip().str.lower()
+                mapping_df["email"] = mapping_df["email"].astype(str).str.strip().str.lower()
 
-            # Create score map
-            score_map = dict(zip(df_b["Student ID Number"], df_b["Total"]))
+                # Map Student ID to df_a
+                email_to_id = dict(zip(mapping_df["email"], mapping_df["Student ID Number"]))
+                df_a["Student ID Number"] = df_a[email_col].map(email_to_id)
 
-            # Add new scores
-            df_a["New Score"] = df_a["Student ID Number"].map(score_map)
+                # Normalize Student IDs
+                df_a["Student ID Number"] = df_a["Student ID Number"].astype(str).str.strip().str.replace(".0", "", regex=False)
+                df_b["Student ID Number"] = df_b["Student ID Number"].astype(str).str.strip()
 
-            # Column to update
-            # st.subheader("📑 Select Column to Update")
-            update_col = st.selectbox("Choose the column in File A to update:", df_a.columns)
+                # ✅ FIX: Clean and convert Total column to numeric
+                df_b["Total"] = df_b["Total"].astype(str).str.replace(",", "").str.strip()
+                df_b["Total"] = pd.to_numeric(df_b["Total"], errors="coerce").fillna(0)
 
-            st.subheader("Preview of Grade Book")
-            st.write(df_a)
+                # ✅ Optional: Round scores to 2 decimal places
+                df_b["Total"] = df_b["Total"].round(2)
 
-            st.subheader("Preview of Live Scores Sheet")
-            st.write(df_b)
+                # Create score map
+                score_map = dict(zip(df_b["Student ID Number"], df_b["Total"]))
 
-            if st.button("🔄 Update Scores"):
-                df_original = df_a.copy()
+                # Add new scores
+                df_a["New Score"] = df_a["Student ID Number"].map(score_map)
 
-                # ✅ Conditionally replace values in update_col
-                df_a[update_col] = df_a.apply(
-                    lambda row: f"{float(row['New Score']):.2f}" if pd.notnull(row["New Score"]) and str(row[update_col]).strip() == "0.00" else row[update_col],
-                    axis=1
-                )
+                # Column to update
+                # st.subheader("📑 Select Column to Update")
+                update_col = st.selectbox("Choose the column in File A to update:", df_a.columns)
 
-                df_updated = df_a.drop(columns=["Student ID Number", "New Score"])
+                st.subheader("Preview of Grade Book")
+                st.write(df_a)
 
-                # 🔍 Preview
-                st.subheader("🔍 Preview of Updated Scores")
-                st.write(df_updated)
+                st.subheader("Preview of Live Scores Sheet")
+                st.write(df_b)
 
-                updated_count = df_a["New Score"].notna().sum()
-                not_found_count = df_a["New Score"].isna().sum()
+                if st.button("🔄 Update Scores"):
+                    df_original = df_a.copy()
 
-                st.subheader("📊 Summary")
-                st.write(f"✅ Total records updated: **{updated_count}**")
-                st.write(f"❌ Students without matching scores: **{not_found_count}**")
+                    # ✅ Conditionally replace values in update_col
+                    df_a[update_col] = df_a.apply(
+                        lambda row: f"{float(row['New Score']):.2f}" if pd.notnull(row["New Score"]) and str(row[update_col]).strip() == "0.00" else row[update_col],
+                        axis=1
+                    )
 
-                
-                # 📥 Download updated CSV
-                csv = df_updated.to_csv(index=False).encode("utf-8")
-                st.download_button("📥 Download Updated CSV", csv, "updated_file.csv", "text/csv")
+                    df_updated = df_a.drop(columns=["Student ID Number", "New Score"])
 
-                # 🔎 Debug view
-                with st.expander("🔎 Debug Info"):
-                    st.dataframe(df_a[[email_col, "Student ID Number", "New Score"]].head(10))
+                    # 🔍 Preview
+                    st.subheader("🔍 Preview of Updated Scores")
+                    st.write(df_updated)
 
-        except Exception as e:
-            st.error(f"❌ An error occurred during processing: {e}")
-    else:
-        st.warning("⚠️ Google Sheet mapping could not be loaded.")
+                    updated_count = df_a["New Score"].notna().sum()
+                    not_found_count = df_a["New Score"].isna().sum()
+
+                    st.subheader("📊 Summary")
+                    st.write(f"✅ Total records updated: **{updated_count}**")
+                    st.write(f"❌ Students without matching scores: **{not_found_count}**")
+
+                    
+                    # 📥 Download updated CSV
+                    csv = df_updated.to_csv(index=False).encode("utf-8")
+                    st.download_button("📥 Download Updated CSV", csv, "updated_file.csv", "text/csv")
+
+                    # 🔎 Debug view
+                    with st.expander("🔎 Debug Info"):
+                        st.dataframe(df_a[[email_col, "Student ID Number", "New Score"]].head(10))
+
+            except Exception as e:
+                st.error(f"❌ An error occurred during processing: {e}")
+        else:
+            st.warning("⚠️ Google Sheet mapping could not be loaded.")
 
 st.markdown(
         """
