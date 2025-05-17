@@ -79,20 +79,24 @@ with col2:
 
     # Display the greeting message
     st.markdown(f"""
-    👋 {get_greeting()} and welcome to the Exam Score Updater App designed by Nnamdi for Miva Open University. 🤗
+        <div style="background-color:#e74c3c; padding:15px; border-radius:10px; color:white; font-weight:bold; font-size:18px;">
+        👋 {get_greeting()} and welcome to the Exam Score Updater App designed by Nnamdi for Miva Open University. 🤗
+        </div>
 
-    This app is designed to help you seamlessly update student scores by merging the Grade Book downloaded from the Miva LMS with the Live Score Sheet.
+        This app is designed to help you seamlessly update student scores by merging the Grade Book downloaded from the Miva LMS with the Live Score Sheet.
 
-    **How to use the app:**
-    1. 📥 Upload the Grade Book file you downloaded from the Miva LMS for the specific course.
-    2. 📊 Upload the Live Score Sheet that contains the latest exam scores for the students.
-    3. 🛠️ Select the column in the Grade Book that you want to update (e.g., Exam, CA, etc.).
-    4. 👀 Preview the updated Grade Book with the new scores.
-    5. ✅ Click the Update Scores button to apply the changes.
-    6. ⬇️ Download the updated sheet and upload it back to the Miva LMS.
+        **How to use the app:**
+        1. 📥 Upload the Grade Book file you downloaded from the Miva LMS for the specific course.
+        2. 📊 Upload the Live Score Sheet that contains the latest exam scores for the students.
+        3. 🛠️ Select the column in the Grade Book that you want to update (e.g., Exam, CA, etc.).
+        4. 👀 Preview the updated Grade Book with the new scores.
+        5. ✅ Click the Update Scores button to apply the changes.
+        6. ⬇️ Download the updated sheet and upload it back to the Miva LMS.
 
-    Feel free to refresh or re-run the app if needed. Happy scoring! 🎯
-    """)
+        Feel free to refresh or re-run the app if needed. Happy scoring! 🎯
+        """, unsafe_allow_html=True)
+
+    st.write("")
     st.write("")
 
     # Upload files
