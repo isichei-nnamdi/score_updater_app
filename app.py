@@ -37,33 +37,6 @@ def load_google_sheet_with_auth(sheet_name: str) -> pd.DataFrame:
         st.error(f"❌ Failed to load Google Sheet: {e}")
         return pd.DataFrame()
 
-# @st.cache_data
-# def load_google_sheet_with_auth(sheet_name):
-#     # try:
-#     creds_dict = st.secrets["gcp_service_account"]
-#     st.success("✅ Credentials loaded.")
-
-#     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-#     credentials = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
-
-#     client = gspread.authorize(credentials)
-#     st.success("✅ Authorized gspread client.")
-
-#     sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1LKPipvPUmM8bImUz6mGfMhFGKWljSroH42WNYCiMQss")
-#     st.success("✅ Opened Google Sheet.")
-
-#     worksheet = sheet.sheet1
-#     st.success("✅ Accessed first worksheet.")
-
-#     data = worksheet.get_all_records()
-#     st.success("✅ Data fetched from Google Sheet.")
-
-#     return pd.DataFrame(data)
-
-#     # except Exception as e:
-#     #     st.error(f"❌ Failed to load Google Sheet: {e}")
-#         # return pd.DataFrame()
-
 
 
 # ==========================
@@ -71,9 +44,34 @@ def load_google_sheet_with_auth(sheet_name: str) -> pd.DataFrame:
 # ==========================
 
 st.title("🔁 Student Score Updater")
+from datetime import datetime
 
-# Google Sheet Info
-# google_sheet_url = "https://docs.google.com/spreadsheets/d/1LKPipvPUmM8bImUz6mGfMhFGKWljSroH42WNYCiMQss/export?format=csv"
+def get_greeting():
+    hour = datetime.now().hour
+    if 5 <= hour < 12:
+        return "Good morning"
+    elif 12 <= hour < 17:
+        return "Good afternoon"
+    elif 17 <= hour < 21:
+        return "Good evening"
+    else:
+        return "Hello"
+
+# Display the greeting message
+st.markdown(f"""
+### 👋 {get_greeting()} and welcome to my Score Updater App designed by Nnamdi. 🤗
+
+This app allows you to quickly update student scores directly into a connected Google Sheet.
+
+**How to use the app:**
+1. Upload or edit the scores using the provided form.
+2. Match each student using their unique ID or email address.
+3. Click **"Submit"** to instantly update the data in the Google Sheet.
+4. Confirm your submission with the success message that appears.
+
+Feel free to refresh or re-run the app if needed. Happy scoring! 🎯
+""")
+
 
 # Upload files
 file_a = st.file_uploader("📤 Upload File A (Grade Book from LMS)", type=["csv"])
@@ -85,8 +83,9 @@ if file_a and file_b:
     df_b = pd.read_csv(file_b, header=1)  # Read second row as header
 
     # Load mapping sheet
-    st.subheader("📥 Loading Mapping Sheet...")
     mapping_df = load_google_sheet_with_auth("enrolled")
+    st.success("✅ Google Sheet loaded successfully.")
+
 
     if not mapping_df.empty:
         try:
@@ -145,11 +144,6 @@ if file_a and file_b:
                 # 🔍 Preview
                 st.subheader("🔍 Preview of Updated Scores")
                 st.write(df_updated)
-                # st.write("**Before Update:**")
-                # st.dataframe(df_original[[update_col]].head())
-
-                # st.write("**After Update:**")
-                # st.dataframe(df_updated[[update_col]].head())
 
                 updated_count = df_a["New Score"].notna().sum()
                 not_found_count = df_a["New Score"].isna().sum()
