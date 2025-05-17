@@ -59,11 +59,11 @@ def get_greeting():
 
 col1, col2, col3 = st.columns([2, 5, 2])
 with col2:
-    st.title("🔁 Student Score Updater")
+    st.title("🔁 Exam Score Updater")
 
     # Display the greeting message
     st.markdown(f"""
-    👋 {get_greeting()} and welcome to my Score Updater App designed by Nnamdi for Miva Open University. 🤗
+    👋 {get_greeting()} and welcome to the Exam Score Updater App designed by Nnamdi for Miva Open University. 🤗
 
     This app is designed to help you seamlessly update student scores by merging the Grade Book downloaded from the Miva LMS with the Live Score Sheet.
 
@@ -77,7 +77,7 @@ with col2:
 
     Feel free to refresh or re-run the app if needed. Happy scoring! 🎯
     """)
-
+    st.write("")
 
     # Upload files
     file_a = st.file_uploader("📤 Upload File A (Grade Book from LMS)", type=["csv"])
