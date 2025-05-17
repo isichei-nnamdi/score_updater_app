@@ -6,7 +6,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 st.set_page_config(
     page_title="Miva Score Updater",
-    page_icon="📊",
+    page_icon="favicon_io/favicon-16x16.png",
     layout="wide"
 )
 
