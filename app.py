@@ -126,7 +126,7 @@ with col2:
                 df_a["Student ID Number"] = df_a[email_col].map(email_to_id)
 
                 # Normalize Student IDs
-                df_a["Student ID Number"] = df_a["Student ID Number"].astype(str).str.strip().str.replace(".0", "", regex=False)
+                # df_a["Student ID Number"] = df_a["Student ID Number"].astype(str).str.strip().str.replace(".0", "", regex=False)
                 df_b["Student ID Number"] = df_b["Student ID Number"].astype(str).str.strip()
 
                 # ✅ FIX: Clean and convert Total column to numeric
