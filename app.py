@@ -60,9 +60,9 @@ def get_greeting():
 col1, col2, col3 = st.columns([2, 5, 2])
 with col2:
     st.markdown(
-        """
+             """
         <div style="display: flex; align-items: center;">
-            <img src="favicon_io/android-chrome-512x512.png" width="40" style="margin-right: 10px;">
+            <img src="favicon_io/android-chrome-512x512.png" width="40" style="margin-right: 10px; display: block;">
             <h1 style="margin: 0;">Exam Score Updater</h1>
         </div>
         """,
