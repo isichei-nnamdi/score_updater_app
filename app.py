@@ -4,6 +4,12 @@ from datetime import datetime
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
+st.set_page_config(
+    page_title="Miva Score Updater",
+    page_icon="📊",
+    layout="wide"
+)
+
 # ==========================
 # Load Google Sheet Public CSV
 # ==========================
@@ -51,7 +57,7 @@ def get_greeting():
 # Streamlit App UI
 # ==========================
 
-col1, col2, col3 = st.columns[1, 5, 1]
+col1, col2, col3 = st.columns([1, 5, 1])
 with col2:
     st.title("🔁 Student Score Updater")
 
