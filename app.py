@@ -57,13 +57,13 @@ def get_greeting():
 # Streamlit App UI
 # ==========================
 
-col1, col2, col3 = st.columns([1, 5, 1])
+col1, col2, col3 = st.columns([2, 5, 2])
 with col2:
     st.title("🔁 Student Score Updater")
 
     # Display the greeting message
     st.markdown(f"""
-    #### 👋 {get_greeting()} and welcome to my Score Updater App designed by Nnamdi for Miva Open University. 🤗
+    👋 {get_greeting()} and welcome to my Score Updater App designed by Nnamdi for Miva Open University. 🤗
 
     This app is designed to help you seamlessly update student scores by merging the Grade Book downloaded from the Miva LMS with the Live Score Sheet.
 
