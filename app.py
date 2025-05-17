@@ -85,30 +85,30 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 @st.cache_data
 def load_google_sheet_with_auth(sheet_name):
-    try:
-        creds_dict = st.secrets["gcp_service_account"]
-        st.success("✅ Credentials loaded.")
+    # try:
+    creds_dict = st.secrets["gcp_service_account"]
+    st.success("✅ Credentials loaded.")
 
-        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        credentials = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    credentials = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 
-        client = gspread.authorize(credentials)
-        st.success("✅ Authorized gspread client.")
+    client = gspread.authorize(credentials)
+    st.success("✅ Authorized gspread client.")
 
-        sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1LKPipvPUmM8bImUz6mGfMhFGKWljSroH42WNYCiMQss")
-        st.success("✅ Opened Google Sheet.")
+    sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1LKPipvPUmM8bImUz6mGfMhFGKWljSroH42WNYCiMQss")
+    st.success("✅ Opened Google Sheet.")
 
-        worksheet = sheet.sheet1
-        st.success("✅ Accessed first worksheet.")
+    worksheet = sheet.sheet1
+    st.success("✅ Accessed first worksheet.")
 
-        data = worksheet.get_all_records()
-        st.success("✅ Data fetched from Google Sheet.")
+    data = worksheet.get_all_records()
+    st.success("✅ Data fetched from Google Sheet.")
 
-        return pd.DataFrame(data)
+    return pd.DataFrame(data)
 
-    except Exception as e:
-        st.error(f"❌ Failed to load Google Sheet: {e}")
-        return pd.DataFrame()
+    # except Exception as e:
+    #     st.error(f"❌ Failed to load Google Sheet: {e}")
+        # return pd.DataFrame()
 
 
 
