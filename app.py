@@ -118,7 +118,8 @@ with col2:
 
                 # Rename for consistency
                 email_col = "SIS Login ID"  # Actual column name in File A
-                df_a[email_col] = df_a[email_col].astype(str).str.strip().str.lower()
+                # df_a[email_col] = df_a[email_col].astype(str).str.strip().str.lower()
+                df_a[email_col] = df_a[email_col].apply(lambda x: str(x).strip().lower() if pd.notnull(x) else "")
                 mapping_df["email"] = mapping_df["email"].astype(str).str.strip().str.lower()
 
                 # Map Student ID to df_a
@@ -126,7 +127,7 @@ with col2:
                 df_a["Student ID Number"] = df_a[email_col].map(email_to_id)
 
                 # Normalize Student IDs
-                # df_a["Student ID Number"] = df_a["Student ID Number"].astype(str).str.strip().str.replace(".0", "", regex=False)
+                df_a["Student ID Number"] = df_a["Student ID Number"].astype(str).str.strip().str.replace(".0", "", regex=False)
                 df_b["Student ID Number"] = df_b["Student ID Number"].astype(str).str.strip()
 
                 # ✅ FIX: Clean and convert Total column to numeric
@@ -165,6 +166,8 @@ with col2:
 
                     # 🔍 Preview
                     st.subheader("🔍 Preview of Updated Scores")
+                    # Before exporting, ensure empty strings are preserved (not 'nan')
+                    df_updated[email_col] = df_updated[email_col].fillna("").astype(str).replace("nan", "")
                     st.write(df_updated)
 
                     updated_count = df_a["New Score"].notna().sum()
