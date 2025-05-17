@@ -59,7 +59,7 @@ def get_greeting():
 
 col1, col2, col3 = st.columns([2, 5, 2])
 with col2:
-    st.title("🔁 Exam Score Updater")
+    st.title("favicon_io/android-chrome-512x512.png Exam Score Updater")
 
     # Display the greeting message
     st.markdown(f"""
