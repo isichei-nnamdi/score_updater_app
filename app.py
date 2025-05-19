@@ -230,12 +230,7 @@ st.markdown(
         }
         </style>
         <div class="main-footer">
-            Design, Developed and Deployed by the <strong>School of Computing</strong> &copy; 2025 <br/>
-            # <div class="footer-icons">
-            #     <a href="https://github.com/isichei-nnamdi" target="_blank">GitHub</a> |
-            #     <a href="https://www.linkedin.com/in/nnamdi-isichei/" target="_blank">LinkedIn</a> |
-            #     <a href="mailto:augustus@miva.university" target="_blank">Email</a>
-            # </div>
+            Design, Developed and Deployed by the <strong>School of Computing</strong> for Miva Open University &copy; 2025 <br/>
         </div>
         """,
         unsafe_allow_html=True
