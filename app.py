@@ -80,7 +80,7 @@ with col2:
     # Display the greeting message
     st.markdown(f"""
         <div style="background-color:#e74c3c; padding:15px; border-radius:10px; color:white; font-weight:bold; font-size:18px;">
-        👋 {get_greeting()} and welcome to the Exam Score Updater App designed by Nnamdi for Miva Open University. 🤗
+        👋 {get_greeting()} and welcome to the Exam Score Updater App, designed by the School of Computing for Miva Open University. 🤗
         </div>
 
         This app is designed to help you seamlessly update student scores by merging the Grade Book downloaded from the Miva LMS with the Live Score Sheet.
@@ -230,12 +230,12 @@ st.markdown(
         }
         </style>
         <div class="main-footer">
-            Design, Developed and Deployed by <strong>Nnamdi A. Isichei</strong> &copy; 2025 <br/>
-            <div class="footer-icons">
-                <a href="https://github.com/isichei-nnamdi" target="_blank">GitHub</a> |
-                <a href="https://www.linkedin.com/in/nnamdi-isichei/" target="_blank">LinkedIn</a> |
-                <a href="mailto:augustus@miva.university" target="_blank">Email</a>
-            </div>
+            Design, Developed and Deployed by the <strong>School of Computing</strong> &copy; 2025 <br/>
+            # <div class="footer-icons">
+            #     <a href="https://github.com/isichei-nnamdi" target="_blank">GitHub</a> |
+            #     <a href="https://www.linkedin.com/in/nnamdi-isichei/" target="_blank">LinkedIn</a> |
+            #     <a href="mailto:augustus@miva.university" target="_blank">Email</a>
+            # </div>
         </div>
         """,
         unsafe_allow_html=True
