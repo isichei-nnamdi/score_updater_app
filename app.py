@@ -39,6 +39,7 @@ def load_google_sheet_with_auth(sheet_name: str) -> pd.DataFrame:
     
     except Exception as e:
         st.error(f"❌ Failed to load Google Sheet: {e}")
+        st.text(traceback.format_exc())
         return pd.DataFrame()
 
 def get_greeting():
