@@ -10,6 +10,11 @@ st.set_page_config(
     layout="wide"
 )
 
+def should_update(old_value):
+    try:
+        return float(str(old_value).strip()) == 0.0
+    except:
+        return False
 # ==========================
 # Load Google Sheet Public CSV
 # ==========================
@@ -162,8 +167,12 @@ with col2:
                     df_original = df_a.copy()
 
                     # ✅ Conditionally replace values in update_col
+                    # df_a[update_col] = df_a.apply(
+                    #     lambda row: f"{float(row['New Score']):.2f}" if pd.notnull(row["New Score"]) and str(row[update_col]).strip() == "0.00" else row[update_col],
+                    #     axis=1
+                    # )
                     df_a[update_col] = df_a.apply(
-                        lambda row: f"{float(row['New Score']):.2f}" if pd.notnull(row["New Score"]) and str(row[update_col]).strip() == "0.00" else row[update_col],
+                        lambda row: f"{float(row['New Score']):.2f}" if pd.notnull(row["New Score"]) and should_update(row[update_col]) else row[update_col],
                         axis=1
                     )
 
