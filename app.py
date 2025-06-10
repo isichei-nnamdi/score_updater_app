@@ -138,7 +138,7 @@ with col2:
 
                 # Normalize Student IDs
                 df_a["Student ID Number"] = df_a["Student ID Number"].astype(str).str.strip().str.replace(".0", "", regex=False)
-                df_b["Student ID Number"] = df_b["Student ID Number"].astype(str).str.strip()
+                df_b["Student ID Number"] = df_b["Student ID Number"].astype(str).str.strip().str.replace(".0", "", regex=False)
 
                 # ✅ FIX: Clean and convert Total column to numeric
                 df_b["Total"] = df_b["Total"].astype(str).str.replace(",", "").str.strip()
