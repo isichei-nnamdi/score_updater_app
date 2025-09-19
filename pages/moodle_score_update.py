@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 import gspread
+import os
 from oauth2client.service_account import ServiceAccountCredentials
 
 st.set_page_config(
@@ -108,6 +109,13 @@ with col2:
     file_a = st.file_uploader("📤 Upload File A (Grade Book from LMS)", type=["csv", "xlsx", "xls"])
     file_b = st.file_uploader("📤 Upload File B (Live Scores Sheet)", type=["csv", "xlsx", "xls"])
 
+    # Get base name of File A (without extension)
+    if file_a is not None:
+        # Get base name of File A (without extension)
+        base_name = os.path.splitext(file_a.name)[0]
+    else:
+        base_name = "Updated_GradeBook"  # fallback default name
+
     def load_file(uploaded_file, header=None):
         """Load CSV or Excel depending on extension"""
         if uploaded_file is None:
@@ -205,19 +213,38 @@ with col2:
                     st.write(f"✅ Total records updated: **{updated_count}**")
                     st.write(f"❌ Students without matching scores: **{not_found_count}**")
 
-                    # 📥 Download options
+                    # # 📥 Download options
+                    # st.download_button(
+                    #     "📥 Download FULL Updated CSV",
+                    #     df_updated.to_csv(index=False).encode("utf-8"),
+                    #     "updated_file.csv",
+                    #     "text/csv"
+                    # )
+                    # st.download_button(
+                    #     "📥 Download ONLY Updated Students",
+                    #     df_updated_only.to_csv(index=False).encode("utf-8"),
+                    #     "updated_students.csv",
+                    #     "text/csv"
+                    # )
+
+                    # Construct new filenames
+                    full_updated_filename = f"{base_name}_Live Score Updated.csv"
+                    updated_only_filename = f"{base_name}_Live Score Updated_Only.csv"
+
+                    # Download buttons with dynamic names
                     st.download_button(
                         "📥 Download FULL Updated CSV",
                         df_updated.to_csv(index=False).encode("utf-8"),
-                        "updated_file.csv",
+                        full_updated_filename,
                         "text/csv"
                     )
                     st.download_button(
                         "📥 Download ONLY Updated Students",
                         df_updated_only.to_csv(index=False).encode("utf-8"),
-                        "updated_students.csv",
+                        updated_only_filename,
                         "text/csv"
                     )
+
 
                     # 🔎 Debug info
                     with st.expander("🔎 Debug Info"):
