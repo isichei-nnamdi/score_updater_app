@@ -10,6 +10,11 @@ st.set_page_config(
     layout="wide"
 )
 
+def should_update(old_value):
+    try:
+        return float(str(old_value).strip()) == 0.0
+    except:
+        return False
 # ==========================
 # Load Google Sheet Public CSV
 # ==========================
@@ -39,6 +44,7 @@ def load_google_sheet_with_auth(sheet_name: str) -> pd.DataFrame:
     
     except Exception as e:
         st.error(f"❌ Failed to load Google Sheet: {e}")
+        st.text(traceback.format_exc())
         return pd.DataFrame()
 
 def get_greeting():
@@ -80,7 +86,7 @@ with col2:
     # Display the greeting message
     st.markdown(f"""
         <div style="background-color:#e74c3c; padding:15px; border-radius:10px; color:white; font-weight:bold; font-size:18px;">
-        👋 {get_greeting()} and welcome to the Exam Score Updater App designed by Nnamdi for Miva Open University. 🤗
+        👋 {get_greeting()} and welcome to the Exam Score Updater App, designed by the School of Computing for Miva Open University. 🤗
         </div>
 
         This app is designed to help you seamlessly update student scores by merging the Grade Book downloaded from the Miva LMS with the Live Score Sheet.
@@ -133,7 +139,7 @@ with col2:
 
                 # Normalize Student IDs
                 df_a["Student ID Number"] = df_a["Student ID Number"].astype(str).str.strip().str.replace(".0", "", regex=False)
-                df_b["Student ID Number"] = df_b["Student ID Number"].astype(str).str.strip()
+                df_b["Student ID Number"] = df_b["Student ID Number"].astype(str).str.strip().str.replace(".0", "", regex=False)
 
                 # ✅ FIX: Clean and convert Total column to numeric
                 df_b["Total"] = df_b["Total"].astype(str).str.replace(",", "").str.strip()
@@ -162,8 +168,12 @@ with col2:
                     df_original = df_a.copy()
 
                     # ✅ Conditionally replace values in update_col
+                    # df_a[update_col] = df_a.apply(
+                    #     lambda row: f"{float(row['New Score']):.2f}" if pd.notnull(row["New Score"]) and str(row[update_col]).strip() == "0.00" else row[update_col],
+                    #     axis=1
+                    # )
                     df_a[update_col] = df_a.apply(
-                        lambda row: f"{float(row['New Score']):.2f}" if pd.notnull(row["New Score"]) and str(row[update_col]).strip() == "0.00" else row[update_col],
+                        lambda row: f"{float(row['New Score']):.2f}" if pd.notnull(row["New Score"]) and should_update(row[update_col]) else row[update_col],
                         axis=1
                     )
 
@@ -231,12 +241,7 @@ st.markdown(
         }
         </style>
         <div class="main-footer">
-            Design, Developed and Deployed by <strong>Nnamdi A. Isichei</strong> &copy; 2025 <br/>
-            <div class="footer-icons">
-                <a href="https://github.com/isichei-nnamdi" target="_blank">GitHub</a> |
-                <a href="https://www.linkedin.com/in/nnamdi-isichei/" target="_blank">LinkedIn</a> |
-                <a href="mailto:augustus@miva.university" target="_blank">Email</a>
-            </div>
+            Design, Developed and Deployed by the <strong>School of Computing</strong> for Miva Open University &copy; 2025 <br/>
         </div>
         """,
         unsafe_allow_html=True
