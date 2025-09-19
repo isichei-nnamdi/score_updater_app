@@ -122,6 +122,7 @@ with col2:
 
                 # Rename for consistency
                 email_col = "SIS Login ID"  # Actual column name in File A
+                email_col = "Email address"  # Actual column name in File A
                 # df_a[email_col] = df_a[email_col].astype(str).str.strip().str.lower()
                 df_a[email_col] = df_a[email_col].apply(lambda x: str(x).strip().lower() if pd.notnull(x) else "")
                 mapping_df["email"] = mapping_df["email"].astype(str).str.strip().str.lower()
