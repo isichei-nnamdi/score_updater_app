@@ -129,6 +129,7 @@ with col2:
                 # st.write(email_to_id)
                 df_a["Student ID Number"] = df_a[email_col].map(email_to_id)
                 st.write(df_a.head())
+                st.write(df_b.head())
 
                 # Normalize Student IDs
                 df_a["Student ID Number"] = df_a["Student ID Number"].astype(str).str.strip().str.replace(".0", "", regex=False)
