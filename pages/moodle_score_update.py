@@ -98,13 +98,34 @@ with col2:
     st.write("")
 
     # Upload files
-    file_a = st.file_uploader("📤 Upload File A (Grade Book from LMS)", type=["csv"])
-    file_b = st.file_uploader("📤 Upload File B (Live Scores Sheet)", type=["csv"])
+    # file_a = st.file_uploader("📤 Upload File A (Grade Book from LMS)", type=["csv"])
+    # file_b = st.file_uploader("📤 Upload File B (Live Scores Sheet)", type=["csv"])
+
+    # if file_a and file_b:
+    #     # Load files
+    #     df_a = pd.read_csv(file_a)
+    #     df_b = pd.read_csv(file_b, header=1)  # Read second row as header
+    file_a = st.file_uploader("📤 Upload File A (Grade Book from LMS)", type=["csv", "xlsx", "xls"])
+    file_b = st.file_uploader("📤 Upload File B (Live Scores Sheet)", type=["csv", "xlsx", "xls"])
+
+    def load_file(uploaded_file, header=None):
+        """Load CSV or Excel depending on extension"""
+        if uploaded_file is None:
+            return None
+        file_type = uploaded_file.name.split(".")[-1].lower()
+        if file_type == "csv":
+            return pd.read_csv(uploaded_file, header=header)
+        elif file_type in ["xlsx", "xls"]:
+            return pd.read_excel(uploaded_file, header=header)
+        else:
+            st.error("❌ Unsupported file format. Please upload CSV or Excel.")
+            return None
 
     if file_a and file_b:
-        # Load files
-        df_a = pd.read_csv(file_a)
-        df_b = pd.read_csv(file_b, header=1)  # Read second row as header
+        # Load files dynamically
+        df_a = load_file(file_a, header=0)       # Grade Book → use first row as header
+        df_b = load_file(file_b, header=1)       # Live Scores → use second row as header
+
 
         # Load mapping sheet
         mapping_df = load_google_sheet_with_auth("enrolled")
@@ -159,34 +180,49 @@ with col2:
                 if st.button("🔄 Update Scores"):
                     df_original = df_a.copy()
 
-                    # ✅ Conditionally replace values in update_col
+                    # ✅ Update values in the chosen column (overwrite if new score exists)
                     df_a[update_col] = df_a.apply(
-                        lambda row: f"{float(row['New Score']):.2f}" if pd.notnull(row["New Score"]) and should_update(row[update_col]) else row[update_col],
+                        lambda row: f"{float(row['New Score']):.2f}" if pd.notnull(row["New Score"]) else row[update_col],
                         axis=1
                     )
 
+                    # ✅ Keep track of updated rows only
+                    updated_rows = df_a[df_a["New Score"].notna()].copy()
+
+                    # Drop helper columns for final export
                     df_updated = df_a.drop(columns=["Student ID Number", "New Score"])
+                    df_updated_only = updated_rows.drop(columns=["Student ID Number", "New Score"])
 
-                    # 🔍 Preview
-                    st.subheader("🔍 Preview of Updated Scores")
-                    df_updated[email_col] = df_updated[email_col].fillna("").astype(str).replace("nan", "")
-                    st.write(df_updated)
+                    # 🔍 Preview only updated students
+                    st.subheader("🔍 Preview of Updated Students")
+                    df_updated_only[email_col] = df_updated_only[email_col].fillna("").astype(str).replace("nan", "")
+                    st.write(df_updated_only)
 
-                    updated_count = df_a["New Score"].notna().sum()
+                    updated_count = updated_rows.shape[0]
                     not_found_count = df_a["New Score"].isna().sum()
 
                     st.subheader("📊 Summary")
                     st.write(f"✅ Total records updated: **{updated_count}**")
                     st.write(f"❌ Students without matching scores: **{not_found_count}**")
 
-                    
-                    # 📥 Download updated CSV
-                    csv = df_updated.to_csv(index=False).encode("utf-8")
-                    st.download_button("📥 Download Updated CSV", csv, "updated_file.csv", "text/csv")
+                    # 📥 Download options
+                    st.download_button(
+                        "📥 Download FULL Updated CSV",
+                        df_updated.to_csv(index=False).encode("utf-8"),
+                        "updated_file.csv",
+                        "text/csv"
+                    )
+                    st.download_button(
+                        "📥 Download ONLY Updated Students",
+                        df_updated_only.to_csv(index=False).encode("utf-8"),
+                        "updated_students.csv",
+                        "text/csv"
+                    )
 
-                    # 🔎 Debug view
+                    # 🔎 Debug info
                     with st.expander("🔎 Debug Info"):
                         st.dataframe(df_a[[email_col, "Student ID Number", "New Score"]].head(10))
+
 
             except Exception as e:
                 st.error(f"❌ An error occurred during processing: {e}")
