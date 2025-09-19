@@ -126,8 +126,9 @@ with col2:
                 st.write(mapping_df.head())
                 # Map Student ID to df_a
                 email_to_id = dict(zip(mapping_df["email"], mapping_df["Student ID Number"]))
-                st.write(email_to_id)
+                # st.write(email_to_id)
                 df_a["Student ID Number"] = df_a[email_col].map(email_to_id)
+                st.write(df_a.head())
 
                 # Normalize Student IDs
                 df_a["Student ID Number"] = df_a["Student ID Number"].astype(str).str.strip().str.replace(".0", "", regex=False)
