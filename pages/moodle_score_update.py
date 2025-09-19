@@ -123,13 +123,11 @@ with col2:
                 df_a[email_col] = df_a[email_col].apply(lambda x: str(x).strip().lower() if pd.notnull(x) else "")
                 mapping_df["email"] = mapping_df["email"].astype(str).str.strip().str.lower()
 
-                st.write(mapping_df.head())
+               
                 # Map Student ID to df_a
                 email_to_id = dict(zip(mapping_df["email"], mapping_df["Student ID Number"]))
-                # st.write(email_to_id)
+                
                 df_a["Student ID Number"] = df_a[email_col].map(email_to_id)
-                st.write(df_a.head())
-                st.write(df_b.head())
 
                 # Normalize Student IDs
                 df_a["Student ID Number"] = df_a["Student ID Number"].astype(str).str.strip().str.replace(".0", "", regex=False)
