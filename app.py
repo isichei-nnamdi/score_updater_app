@@ -74,14 +74,6 @@ with col2:
         """,
         unsafe_allow_html=True
     )
-    # col1, col2 = st.columns([1, 8])
-
-    # with col1:
-    #     st.image("favicon_io/android-chrome-512x512.png", width=40) 
-    
-    # with col2:
-    #     st.markdown("<h1 style='margin: 0; padding-top: 10px;'>Exam Score Updater</h1>", unsafe_allow_html=True)
-    # st.title("favicon_io/android-chrome-512x512.png Exam Score Updater")
 
     # Display the greeting message
     st.markdown(f"""
@@ -127,7 +119,7 @@ with col2:
                 mapping_df.columns = mapping_df.columns.str.strip()
 
                 # Rename for consistency
-                email_col = "SIS Login ID"  # Actual column name in File A
+                # email_col = "SIS Login ID"  # Actual column name in File A
                 email_col = "Email address"  # Actual column name in File A
                 # df_a[email_col] = df_a[email_col].astype(str).str.strip().str.lower()
                 df_a[email_col] = df_a[email_col].apply(lambda x: str(x).strip().lower() if pd.notnull(x) else "")
@@ -168,10 +160,6 @@ with col2:
                     df_original = df_a.copy()
 
                     # ✅ Conditionally replace values in update_col
-                    # df_a[update_col] = df_a.apply(
-                    #     lambda row: f"{float(row['New Score']):.2f}" if pd.notnull(row["New Score"]) and str(row[update_col]).strip() == "0.00" else row[update_col],
-                    #     axis=1
-                    # )
                     df_a[update_col] = df_a.apply(
                         lambda row: f"{float(row['New Score']):.2f}" if pd.notnull(row["New Score"]) and should_update(row[update_col]) else row[update_col],
                         axis=1
