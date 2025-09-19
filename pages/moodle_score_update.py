@@ -119,12 +119,11 @@ with col2:
                 mapping_df.columns = mapping_df.columns.str.strip()
 
                 # Rename for consistency
-                # email_col = "SIS Login ID"  # Actual column name in File A
                 email_col = "Email address"  # Actual column name in File A
-                # df_a[email_col] = df_a[email_col].astype(str).str.strip().str.lower()
                 df_a[email_col] = df_a[email_col].apply(lambda x: str(x).strip().lower() if pd.notnull(x) else "")
                 mapping_df["email"] = mapping_df["email"].astype(str).str.strip().str.lower()
 
+                st.write(mapping_df.head())
                 # Map Student ID to df_a
                 email_to_id = dict(zip(mapping_df["email"], mapping_df["Student ID Number"]))
                 df_a["Student ID Number"] = df_a[email_col].map(email_to_id)
@@ -169,7 +168,6 @@ with col2:
 
                     # 🔍 Preview
                     st.subheader("🔍 Preview of Updated Scores")
-                    # Before exporting, ensure empty strings are preserved (not 'nan')
                     df_updated[email_col] = df_updated[email_col].fillna("").astype(str).replace("nan", "")
                     st.write(df_updated)
 
